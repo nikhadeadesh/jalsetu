@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>JalSetu – Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#F4F6FB;--card:#fff;--ink:#1F2937;--mut:#6B7280;--navy:#1B2A5C;--org:#F28C28;--ok:#1E8E5A;--warn:#C77700;--bad:#C0392B;--line:#DDE2EF;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1530;--card:#18204A;--ink:#E8ECF8;--mut:#A9B3D6;--navy:#F28C28;--line:#2C3766;--ok:#4FD08F;--warn:#F5B04C;--bad:#FF7B6B}}
+:root[data-theme="dark"]{--bg:#0F1530;--card:#18204A;--ink:#E8ECF8;--mut:#A9B3D6;--navy:#F28C28;--line:#2C3766;--ok:#4FD08F;--warn:#F5B04C;--bad:#FF7B6B}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Calibri,Arial,sans-serif}
+.w{max-width:980px;margin:0 auto;padding:20px 16px 40px}
+h1{margin:0;font-size:26px;color:var(--navy)}.sub{color:var(--mut);margin:2px 0 14px}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:999px;font:inherit;cursor:pointer}
+.tabs button.on{background:var(--org);border-color:var(--org);color:#fff;font-weight:700}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:720px){.g{grid-template-columns:1fr}}
+.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+h2{margin:0 0 8px;font-size:17px;color:var(--navy)}
+label{display:flex;justify-content:space-between;margin-top:12px;font-weight:700}
+input[type=range]{width:100%;accent-color:var(--org)}
+.big{font-size:38px;font-weight:700;color:var(--org);line-height:1.1}.mut{color:var(--mut);font-size:13px}
+.stat{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}.stat div{min-width:110px}
+.node{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}.node:first-of-type{border-top:0}
+.node b{width:92px}.chip{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff}
+.ok{background:var(--ok)}.warn{background:var(--warn)}.bad{background:var(--bad)}
+.btn{background:var(--org);color:#fff;border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer;margin-top:10px}
+.btn.s{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.log{max-height:230px;overflow:auto;font-size:14px}.log div{padding:6px 0;border-top:1px solid var(--line)}.log div:first-child{border-top:0}
+svg{display:block;width:100%;height:auto}.flow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
+.flow div{flex:1;min-width:140px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:14px}.flow b{color:var(--navy);display:block}
+.hide{display:none}
+</style></head><body><div class="w">
+<h1>JalSetu</h1><div class="sub">Smart rainwater recharge software for drought-prone villages · Team SEVAINDIA · Demo with sample data</div>
+<div class="tabs"><button class="on" data-t="sim">1 · Recharge simulator</button><button data-t="map">2 · Village dashboard</button><button data-t="how">3 · How it works</button></div>
+
+<div id="sim"><div class="g">
+<div class="c"><h2>Your roof or farm catchment</h2>
+<label>Catchment area <span id="vA"></span></label><input id="A" type="range" min="20" max="500" step="10" value="100">
+<label>Annual rainfall <span id="vR"></span></label><input id="R" type="range" min="300" max="1200" step="25" value="700">
+<label>Surface type <span id="vK"></span></label>
+<select id="K" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin-top:6px">
+<option value="0.8">Tiled / concrete roof (0.8)</option><option value="0.9">Metal sheet roof (0.9)</option><option value="0.3">Open farm land (0.3)</option></select>
+<label>Households sharing the recharge well <span id="vH"></span></label><input id="H" type="range" min="1" max="100" step="1" value="20">
+<div class="mut" style="margin-top:10px">Water captured = area × rainfall × runoff coefficient (1 mm on 1 m² = 1 litre).</div></div>
+<div class="c"><h2>Water you can recharge each year</h2><div class="big" id="out">–</div><div class="mut">litres per year, after a 10% first-flush loss</div>
+<div class="stat"><div><b id="o2">–</b><div class="mut">tanker loads of 10,000 L</div></div><div><b id="o3">–</b><div class="mut">litres per household</div></div></div>
+<svg viewBox="0 0 300 90" role="img" aria-label="Captured versus lost"><rect x="0" y="30" width="300" height="26" rx="6" fill="var(--line)"/><rect id="bar" x="0" y="30" width="150" height="26" rx="6" fill="var(--org)"/>
+<text x="0" y="20" font-size="12" fill="var(--mut)">Rain captured vs. lost as runoff</text><text id="bt" x="0" y="78" font-size="12" fill="var(--mut)"></text></svg></div></div></div>
+
+<div id="map" class="hide"><div class="g">
+<div class="c"><h2>Village wells (water level, metres below ground)</h2><div id="nodes"></div><div style="margin-top:12px"><b>Log a reading, as villagers would by SMS or form</b><div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap"><select id="ws" style="padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit"></select><input id="wd" type="number" step="0.1" min="1" max="30" value="11" style="width:90px;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit"><button class="btn s" id="sub" style="margin-top:0">Submit</button></div></div>
+<button class="btn" id="rain">Simulate 60 mm rain event</button> <button class="btn s" id="dry">Simulate dry week</button> <button class="btn s" id="rst">Reset</button></div>
+<div class="c"><h2>Village average, last 8 readings</h2><svg id="spark" viewBox="0 0 300 120" role="img" aria-label="Water level trend"></svg><div class="mut">Lower number means a higher water table. Alert threshold: 12 m.</div>
+<h2 style="margin-top:12px">Alerts for the gram panchayat</h2><div class="log" id="log"></div></div></div></div>
+
+<div id="how" class="hide"><div class="c"><h2>From rooftop to recharge report</h2><div class="flow">
+<div><b>1 · Collect</b>Public rainfall and groundwater data, plus well readings sent by villagers.</div><div><b>2 · Plan</b>Calculator shows how much each roof or farm can recharge.</div>
+<div><b>3 · Track</b>Dashboard follows each well's water level over time.</div><div><b>4 · Alert</b>SMS and app alerts flag low wells to the panchayat.</div><div><b>5 · Report</b>Panchayat gets litres recharged and water-level change.</div></div>
+<p class="mut" style="margin-top:12px">Prototype note: all readings on this page are sample data for demonstration. Field values will come from the pilot kits.</p></div></div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)},fm=function(n){return Math.round(n).toLocaleString('en-IN')};
+document.querySelectorAll('.tabs button').forEach(function(b){b.onclick=function(){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');['sim','map','how'].forEach(function(t){$(t).classList.toggle('hide',t!==b.dataset.t)})}});
+function calc(){var A=+$('A').value,R=+$('R').value,K=+$('K').value,H=+$('H').value;
+$('vA').textContent=A+' m²';$('vR').textContent=R+' mm';$('vH').textContent=H;$('vK').textContent='';
+var raw=A*R*K,net=raw*0.9;$('out').textContent=fm(net)+' L';$('o2').textContent=(net/10000).toFixed(1);$('o3').textContent=fm(net/H);
+var tot=A*R,pct=Math.round(raw/tot*100);$('bar').setAttribute('width',300*raw/tot);$('bt').textContent=pct+'% captured, '+(100-pct)+'% lost';}
+['A','R','K','H'].forEach(function(i){$(i).oninput=calc;$(i).onchange=calc});calc();
+var base=[10.2,11.4,12.6,9.1,13.3,10.8],names=['Well A','Well B','Well C','Well D','Well E','Well F'],lv,hist,logs;
+function reset(){lv=base.slice();hist=[];for(var i=0;i<8;i++)hist.push(avg()+0.15*(7-i)*(i%2?1:0.6));hist[7]=avg();logs=[['Demo ready. Press a button to simulate field events.']];draw()}
+function avg(){return lv.reduce(function(a,b){return a+b},0)/lv.length}
+function st(v){return v>12?['Low','bad']:v>10.5?['Watch','warn']:['Good','ok']}
+function draw(){var h='';lv.forEach(function(v,i){var s=st(v);h+='<div class="node"><b>'+names[i]+'</b><span style="flex:1">'+v.toFixed(1)+' m</span><span class="chip '+s[1]+'">'+s[0]+'</span></div>'});$('nodes').innerHTML=h;
+var mn=Math.min.apply(null,hist)-0.5,mx=Math.max.apply(null,hist)+0.5,p=hist.map(function(v,i){return [20+i*37,10+(v-mn)/(mx-mn)*95]});
+$('spark').innerHTML='<line x1="12" x2="292" y1="'+(10+(12-mn)/(mx-mn)*95)+'" y2="'+(10+(12-mn)/(mx-mn)*95)+'" stroke="var(--bad)" stroke-dasharray="4 4"/><polyline fill="none" stroke="var(--org)" stroke-width="3" points="'+p.map(function(q){return q.join(',')}).join(' ')+'"/>'+p.map(function(q){return '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="3.5" fill="var(--org)"/>'}).join('');
+$('log').innerHTML=logs.map(function(l){return '<div>'+l[0]+'</div>'}).join('')}
+function push(m){logs.unshift([m]);hist.shift();hist.push(avg())}
+$('rain').onclick=function(){var lows=0;lv=lv.map(function(v,i){var d=0.8+0.25*(i%3);return Math.max(6,v-d)});push('Heavy rain: recharge wells absorbed runoff, village average water level improved to '+avg().toFixed(1)+' m.');draw()};
+$('dry').onclick=function(){lv=lv.map(function(v){return v+0.5});var L=lv.map(function(v,i){return v>12?names[i]:''}).filter(Boolean);push(L.length?'Dry week: '+L.join(', ')+' above the 12 m threshold. SMS alert sent to the panchayat.':'Dry week: water levels slipped by 0.5 m, no well above the 12 m threshold yet.');draw()};
+$('rst').onclick=reset;$('sub').onclick=function(){var i=+$('ws').value,v=parseFloat($('wd').value);if(isNaN(v))return;lv[i]=v;var s=st(v);push(names[i]+' reading logged: '+v.toFixed(1)+' m ('+s[0]+').'+(v>12?' Alert sent to the panchayat.':''));draw()};$('ws').innerHTML=names.map(function(n,i){return '<option value="'+i+'">'+n+'</option>'}).join('');reset();
+</script></body></html>
